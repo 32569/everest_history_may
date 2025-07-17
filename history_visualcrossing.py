@@ -2,31 +2,36 @@ import os
 import csv
 import requests
 
-# Imame API raktą iš GitHub Secrets
 API_KEY = os.getenv("VC_API_KEY")
 BASE_URL = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline"
 
-# Vietovės: ABC stovykla ir viršūnė
 LOCATIONS = [
     {"name": "Everest ABC Camp", "lat": 28.0024, "lon": 86.8528},
     {"name": "Everest Summit",    "lat": 27.9881, "lon": 86.9250},
 ]
 
-# Intervalas ISO formatu
 START = "2025-05-24T00:00:00"
 END   = "2025-05-25T00:00:00"
 
-# CSV antraštė
+# Pridedame naujus elementus: krituliai, sniegas, debesuotumas, matomumas, UV, radiacija, rasos taškas, gūsiai
 HEADER = [
-    "location",
-    "datetime_UTC",
-    "temp_C",
-    "feelslike_C",
-    "humidity_%",
-    "wind_speed_kph",
-    "wind_dir_deg",
-    "pressure_hPa"
+    "location","datetime_UTC",
+    "temp_C","feelslike_C","dewpoint_C","humidity_%",
+    "wind_speed_kph","wind_gust_kph","wind_dir_deg",
+    "pressure_hPa","sealevelpressure_hPa",
+    "precip_mm","snow_cm","snowdepth_cm",
+    "cloudcover_%","visibility_km",
+    "uvindex","solarradiation_W/m2"
 ]
+
+ELEMENTS = ",".join([
+    "datetime","temp","feelslike","dew","humidity",
+    "windspeed","windgust","winddir",
+    "pressure","sealevelpressure",
+    "precip","snow","snowdepth",
+    "cloudcover","visibility",
+    "uvindex","solarradiation"
+])
 
 def fetch_location(loc):
     coords = f"{loc['lat']},{loc['lon']}"
@@ -36,7 +41,7 @@ def fetch_location(loc):
         "include":     "hours",
         "key":         API_KEY,
         "contentType": "json",
-        "elements":    "datetime,temp,feelslike,humidity,windspeed,winddir,pressure"
+        "elements":    ELEMENTS
     }
     r = requests.get(url, params=params)
     r.raise_for_status()
@@ -46,13 +51,23 @@ def fetch_location(loc):
         for h in day.get("hours", []):
             rows.append([
                 loc["name"],
-                h["datetime"],
+                h.get("datetime"),
                 h.get("temp"),
                 h.get("feelslike"),
+                h.get("dew"),
                 h.get("humidity"),
                 h.get("windspeed"),
+                h.get("windgust"),
                 h.get("winddir"),
-                h.get("pressure")
+                h.get("pressure"),
+                h.get("sealevelpressure"),
+                h.get("precip"),
+                h.get("snow"),
+                h.get("snowdepth"),
+                h.get("cloudcover"),
+                h.get("visibility"),
+                h.get("uvindex"),
+                h.get("solarradiation")
             ])
     return rows
 
