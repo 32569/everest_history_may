@@ -1,9 +1,8 @@
-name: Manual VisualCrossing History
+name: Manual VisualCrossing History (extended data)
 
 permissions:
   contents: write
 
-# Tik rankinis paleidimas
 on:
   workflow_dispatch:
 
@@ -12,28 +11,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           persist-credentials: true
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      - name: Install requests
-        run: pip install --no-cache-dir requests
+      - run: pip install --no‑cache‑dir requests
 
       - name: Fetch historical data
         env:
           VC_API_KEY: ${{ secrets.VC_API_KEY }}
         run: python history_visualcrossing.py
 
-      - name: Commit CSV
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - run: |
+          git config user.name "github‑actions[bot]"
+          git config user.email "github‑actions[bot]@users.noreply.github.com"
           git add history_visualcrossing.csv
-          git commit -m "VisualCrossing history 2025-05-24 to 2025-05-25" || echo "No changes to commit"
+          git commit -m "Extended VisualCrossing history 2025‑05‑24 to 2025‑05‑25" || echo "No changes"
           git push
