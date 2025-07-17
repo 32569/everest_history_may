@@ -19,16 +19,19 @@ jobs:
         with:
           python-version: '3.x'
 
-      - run: pip install --no‑cache‑dir requests
+      # ČIA PAŠALINOME --no-cache-dir
+      - name: Install requests
+        run: pip install requests
 
       - name: Fetch historical data
         env:
           VC_API_KEY: ${{ secrets.VC_API_KEY }}
         run: python history_visualcrossing.py
 
-      - run: |
-          git config user.name "github‑actions[bot]"
-          git config user.email "github‑actions[bot]@users.noreply.github.com"
+      - name: Commit CSV
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add history_visualcrossing.csv
-          git commit -m "Extended VisualCrossing history 2025‑05‑24 to 2025‑05‑25" || echo "No changes"
+          git commit -m "Extended VisualCrossing history 2025-05-24 to 2025-05-25" || echo "No changes"
           git push
